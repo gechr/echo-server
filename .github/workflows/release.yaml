@@ -54,7 +54,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+      - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
         id: app-token
         with:
           app-id: ${{ vars.HOMEBREW_APP_ID }}
@@ -73,7 +73,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - uses: gechr/homebrew-publish-formula@65dd55a61ec1be6c118e94cf20b5292916d6ce0d # v1.0.2
+      - uses: gechr/homebrew-publish-formula@4864f09a7c818fe567baecb65eb87518b4467240 # v1.0.4
         with:
           name: echo-server
           desc: "HTTP echo server that returns request details as JSON"
