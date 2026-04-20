@@ -80,3 +80,4 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           version: ${{ github.ref_name }}
           homepage: https://github.com/${{ github.repository }}
+          completion-args: ""
