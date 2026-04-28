@@ -41,14 +41,14 @@ jobs:
           go-version-file: go.mod
           cache: false
 
-      - uses: goreleaser/goreleaser-action@ec59f474b9834571250b370d4735c50f8e2d1e29 # v7.0.0
+      - uses: goreleaser/goreleaser-action@e24998b8b67b290c2fa8b7c14fcfa7de2c5c9b8c # v7.1.0
         with:
           distribution: goreleaser
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - uses: gechr/homebrew-publish-formula@4864f09a7c818fe567baecb65eb87518b4467240 # v1.0.4
+      - uses: gechr/homebrew-publish-formula@04c96853dce59cfbfca97503d2cc625cb3321cee # v1.0.5
         with:
           name: echo-server
           desc: "HTTP echo server that returns request details as JSON"
