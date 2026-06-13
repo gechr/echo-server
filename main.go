@@ -29,6 +29,10 @@ const (
 	headerEchoHost   = "X-Nginx-Echo-Host"
 	headerEchoIP     = "X-Nginx-Echo-Ip"
 	headerEchoScheme = "X-Nginx-Echo-Scheme"
+
+	contentTypeForm        = "application/x-www-form-urlencoded"
+	contentTypeJSON        = "application/json"
+	contentTypeOctetStream = "application/octet-stream"
 )
 
 type response struct {
@@ -85,7 +89,7 @@ func cleanHeaders(headers http.Header) map[string]any {
 
 func encodeData(body []byte, contentType string) string {
 	if contentType == "" {
-		contentType = "application/octet-stream"
+		contentType = contentTypeOctetStream
 	}
 	data := base64.URLEncoding.EncodeToString(body)
 	return "data:" + contentType + ";base64," + data
@@ -110,13 +114,13 @@ func parseBody(r *http.Request, resp *response) error {
 	case "text/html", "text/plain":
 		return nil
 
-	case "application/x-www-form-urlencoded":
+	case contentTypeForm:
 		if _, err := url.ParseQuery(string(body)); err != nil {
 			return err
 		}
 		resp.Data = string(body)
 
-	case "application/json":
+	case contentTypeJSON:
 		if err := json.Unmarshal(body, &resp.JSON); err != nil {
 			return err
 		}

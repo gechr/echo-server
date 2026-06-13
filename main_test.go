@@ -173,7 +173,7 @@ func TestPOSTJSON(t *testing.T) {
 		"/",
 		strings.NewReader(`{"hello":"world","n":42}`),
 		map[string]string{
-			"Content-Type": "application/json",
+			"Content-Type": contentTypeJSON,
 		},
 	)
 	if resp.StatusCode != http.StatusOK {
@@ -220,7 +220,7 @@ func TestPOSTForm(t *testing.T) {
 		"/",
 		strings.NewReader("a=1&b=two&a=also"),
 		map[string]string{
-			"Content-Type": "application/x-www-form-urlencoded",
+			"Content-Type": contentTypeForm,
 		},
 	)
 	if resp.StatusCode != http.StatusOK {
@@ -268,7 +268,7 @@ func TestPOSTBinaryBase64(t *testing.T) {
 		"/",
 		bytes.NewReader([]byte{0x00, 0x01, 0x02, 0xff}),
 		map[string]string{
-			"Content-Type": "application/octet-stream",
+			"Content-Type": contentTypeOctetStream,
 		},
 	)
 	if resp.StatusCode != http.StatusOK {
@@ -311,7 +311,7 @@ func TestBodyMethods(t *testing.T) {
 				"/",
 				strings.NewReader(`{"m":1}`),
 				map[string]string{
-					"Content-Type": "application/json",
+					"Content-Type": contentTypeJSON,
 				},
 			)
 			if resp.StatusCode != http.StatusOK {
@@ -338,7 +338,7 @@ func TestInvalidJSON(t *testing.T) {
 		"/",
 		strings.NewReader("not-json"),
 		map[string]string{
-			"Content-Type": "application/json",
+			"Content-Type": contentTypeJSON,
 		},
 	)
 	if resp.StatusCode != http.StatusBadRequest {
@@ -365,7 +365,7 @@ func TestInvalidForm(t *testing.T) {
 		"/",
 		strings.NewReader("bad=%ZZ"),
 		map[string]string{
-			"Content-Type": "application/x-www-form-urlencoded",
+			"Content-Type": contentTypeForm,
 		},
 	)
 	if resp.StatusCode != http.StatusBadRequest {
@@ -377,7 +377,7 @@ func TestOversizedBody(t *testing.T) {
 	srv := newTestServer(t)
 	big := bytes.Repeat([]byte{'a'}, srvMaxBodyBytes+1)
 	resp, body := doRequest(t, srv, http.MethodPost, "/", bytes.NewReader(big), map[string]string{
-		"Content-Type": "application/octet-stream",
+		"Content-Type": contentTypeOctetStream,
 	})
 	if resp.StatusCode != http.StatusRequestEntityTooLarge {
 		t.Fatalf(
@@ -397,7 +397,7 @@ func TestOversizedChunked(t *testing.T) {
 	srv := newTestServer(t)
 	big := bytes.Repeat([]byte{'a'}, srvMaxBodyBytes+1)
 	req, _ := http.NewRequest(http.MethodPost, srv.URL+"/", unsizedReader{bytes.NewReader(big)})
-	req.Header.Set("Content-Type", "application/octet-stream")
+	req.Header.Set("Content-Type", contentTypeOctetStream)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("do request: %v", err)
@@ -411,7 +411,7 @@ func TestOversizedChunked(t *testing.T) {
 func TestEmptyPOST(t *testing.T) {
 	srv := newTestServer(t)
 	resp, body := doRequest(t, srv, http.MethodPost, "/", nil, map[string]string{
-		"Content-Type": "application/json",
+		"Content-Type": contentTypeJSON,
 	})
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("status = %d, body = %s", resp.StatusCode, body)
