@@ -1,6 +1,7 @@
 module github.com/gechr/echo-server
 
-go 1.26.2
+// @clover
+go 1.26.5
 
 tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 
