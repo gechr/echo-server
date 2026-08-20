@@ -158,7 +158,7 @@ func getParams(r *http.Request) map[string]any {
 }
 
 func getURL(r *http.Request) string {
-	u := *r.URL
+	u := r.URL.Clone()
 	u.Scheme = getScheme(r)
 	u.Host = getHost(r)
 	if u.Path == "/" {

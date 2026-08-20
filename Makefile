@@ -1,6 +1,6 @@
 GO           ?= go
 GO_BIN       ?= $(shell $(GO) env GOPATH)/bin
-GO_TOOLS     ?= $(shell $(GO) tool | grep /)
+GO_TOOLS     ?= $(shell $(GO) list tool)
 
 DIST_DIR     ?= dist
 

@@ -12,11 +12,13 @@ import (
 	"testing"
 )
 
+// testBaseURL is any absolute URL: the in-memory server answers every host, and
+// httptest.Server.URL is empty when the server is not on a listener.
+const testBaseURL = "http://echo.test"
+
 func newTestServer(t *testing.T) *httptest.Server {
 	t.Helper()
-	srv := httptest.NewServer(configureHandler())
-	t.Cleanup(srv.Close)
-	return srv
+	return httptest.NewTestServer(t, configureHandler())
 }
 
 func doRequest(
@@ -27,14 +29,14 @@ func doRequest(
 	headers map[string]string,
 ) (*http.Response, []byte) {
 	t.Helper()
-	req, err := http.NewRequest(method, srv.URL+path, body)
+	req, err := http.NewRequest(method, testBaseURL+path, body)
 	if err != nil {
 		t.Fatalf("new request: %v", err)
 	}
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := srv.Client().Do(req)
 	if err != nil {
 		t.Fatalf("do request: %v", err)
 	}
@@ -133,10 +135,10 @@ func TestGETWithEchoHeadersAndParams(t *testing.T) {
 
 func TestGETMultiValuedHeader(t *testing.T) {
 	srv := newTestServer(t)
-	req, _ := http.NewRequest(http.MethodGet, srv.URL+"/", nil)
+	req, _ := http.NewRequest(http.MethodGet, testBaseURL+"/", nil)
 	req.Header.Add("X-Test", "one")
 	req.Header.Add("X-Test", "two")
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := srv.Client().Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -283,9 +285,9 @@ func TestPOSTBinaryBase64(t *testing.T) {
 
 func TestPOSTBinaryNoContentTypeDefaults(t *testing.T) {
 	srv := newTestServer(t)
-	req, _ := http.NewRequest(http.MethodPost, srv.URL+"/", bytes.NewReader([]byte{0x01, 0x02}))
+	req, _ := http.NewRequest(http.MethodPost, testBaseURL+"/", bytes.NewReader([]byte{0x01, 0x02}))
 	req.Header.Del("Content-Type")
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := srv.Client().Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -396,9 +398,9 @@ func (u unsizedReader) Read(p []byte) (int, error) { return u.r.Read(p) }
 func TestOversizedChunked(t *testing.T) {
 	srv := newTestServer(t)
 	big := bytes.Repeat([]byte{'a'}, srvMaxBodyBytes+1)
-	req, _ := http.NewRequest(http.MethodPost, srv.URL+"/", unsizedReader{bytes.NewReader(big)})
+	req, _ := http.NewRequest(http.MethodPost, testBaseURL+"/", unsizedReader{bytes.NewReader(big)})
 	req.Header.Set("Content-Type", contentTypeOctetStream)
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := srv.Client().Do(req)
 	if err != nil {
 		t.Fatalf("do request: %v", err)
 	}
