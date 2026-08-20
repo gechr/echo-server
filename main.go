@@ -210,8 +210,7 @@ func handleEcho(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodDelete, http.MethodPatch, http.MethodPost, http.MethodPut:
 		if err := parseBody(r, resp); err != nil {
-			var mbe *http.MaxBytesError
-			if errors.As(err, &mbe) {
+			if _, ok := errors.AsType[*http.MaxBytesError](err); ok {
 				writeError(w, http.StatusRequestEntityTooLarge, err)
 				return
 			}
