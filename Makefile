@@ -34,5 +34,6 @@ test:
 
 .PHONY: update
 update:
+	@clover run
 	@$(GO) get $(GO_TOOLS) $(shell $(GO) list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all)
 	@$(GO) mod tidy
